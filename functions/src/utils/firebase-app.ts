@@ -15,12 +15,10 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 
-const db = admin.firestore();
+export const db = admin.firestore();
+export default admin;
 
-module.exports = {
-  db,
-  admin,
-};
+
 
 
 

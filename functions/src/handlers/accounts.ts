@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import firebase from 'firebase';
 
-const { db, admin } = require('../utils/firebase-app');
+import Admin, { db }  from '../utils/firebase-app';
 
 export const registerAccount = (req: Request, res: Response, next: NextFunction) => {
 
@@ -27,7 +27,7 @@ export const searchByDiscordID = (req: Request, res: Response, next: NextFunctio
   const id = req.params.id;
 
   db.collection('summoners').where('discordID', "==", id)
-    .get().then(( querySnapshot: firebase.firestore.QuerySnapshot) => {
+    .get().then(( querySnapshot: any) => {
 
       if (querySnapshot.empty){
 
@@ -39,7 +39,6 @@ export const searchByDiscordID = (req: Request, res: Response, next: NextFunctio
 
         querySnapshot.forEach((doc: any) => {
           accounts.push({
-            accountID: doc.id,
             ...doc.data(),
           });
         });
@@ -47,8 +46,6 @@ export const searchByDiscordID = (req: Request, res: Response, next: NextFunctio
         res.status(200).json(accounts);
 
       }
-
-
     }).catch((error: any) => {
       console.error(error);
       res.status(400).json(error);
