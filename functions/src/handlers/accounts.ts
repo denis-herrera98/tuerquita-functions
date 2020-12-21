@@ -1,6 +1,4 @@
 import { Request, Response, NextFunction } from 'express'
-import firebase from 'firebase';
-
 import Admin, { db }  from '../utils/firebase-app';
 
 export const registerSummoner = async (req: Request, res: Response) => {
@@ -8,30 +6,69 @@ export const registerSummoner = async (req: Request, res: Response) => {
   const { discordID, accountId,  puuid, regionURL, summonerId } = req.body;
 
   const accountsRef = db.collection('summoners');
-
   const snapshot = await accountsRef.where('discordID', '==', discordID).where('puuid', '==', puuid).get();
 
-  if (snapshot.empty) {
+  if (!snapshot.empty) {
+    return res.status(409).send('You have already registered that account')
+  }
+  console.log('sigio la caca');
 
-  await registerAccount(discordID);
+  const userAccount = await db.collection('accounts').doc(discordID).get();
 
-  db.collection('summoners').add({
-    puuid,
-    discordID,
-    regionURL,
-    accountId,
-    summonerId,
-  }).then(() => {
-    res.status(200).send('Summoner added')
-  })
-    .catch((error: any) => {
+  if (!userAccount.exists){
+    await registerAccount(discordID);
+  }
+
+  console.log(userAccount.data());
+
+  if (userAccount.data()?.premium ){
+
+    db.collection('summoners').add({
+      puuid,
+      discordID,
+      regionURL,
+      accountId,
+      summonerId,
+    }).then(() => {
+      return res.status(200).send('Summoner added')
+    }).catch((error: any) => {
       console.error(error);
-      res.status(400).json({message: "Can not added summoner", error: error});
+      return res.status(400).json({message: "Account could not be added", error: error});
     });
 
   } else {
-      res.status(409).send("User already added account");
+
+    const oldAccountSnapshotQuery = await db.collection('summoners').where('discordID', "==", discordID).get();
+
+    if (!oldAccountSnapshotQuery.empty){
+     try {
+      oldAccountSnapshotQuery.forEach((querySnapshot: any) => {
+       querySnapshot.ref.delete();
+      })
+     } catch (error) {
+      return res.status(400).send('Account could not be added')
+     }
+
+    }
+
+    db.collection('summoners').add({
+      puuid,
+      discordID,
+      regionURL,
+      accountId,
+      summonerId,
+    }).then(() => {
+
+      return res.status(200).send('The account was overwritten')
+    }).catch((error: any) => {
+      console.error(error);
+      return res.status(400).json({message: "Can not added summoner", error: error});
+    });
+
+
+
   }
+
 
 };
 
@@ -55,7 +92,7 @@ export const searchSummonerByDiscordID = (req: Request, res: Response ) => {
 
       if (querySnapshot.empty){
 
-        res.status(404).send("User not found")
+        return res.status(404).send("User not found")
 
       } else {
 
@@ -67,12 +104,12 @@ export const searchSummonerByDiscordID = (req: Request, res: Response ) => {
           });
         });
 
-        res.status(200).json(accounts);
+        return res.status(200).json(accounts);
 
       }
     }).catch((error: any) => {
       console.error(error);
-      res.status(400).json(error);
+      return res.status(400).json(error);
     });
 };
 
@@ -84,14 +121,14 @@ export const searchAccountByDiscordID = (req: Request, res: Response ) => {
   accountRef.get().then((doc: any) => {
 
     if(doc.exists){
-      res.status(200).json(doc.data());
+      return res.status(200).json(doc.data());
     } else {
-      res.status(404).send("User not found")
+      return res.status(404).send("User not found")
     }
 
   }).catch((error: any) => {
     console.error(error);
-    res.status(400).json(error);
+    return res.status(400).json(error);
   });
 };
 
