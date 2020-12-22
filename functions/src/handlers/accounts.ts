@@ -11,7 +11,6 @@ export const registerSummoner = async (req: Request, res: Response) => {
   if (!snapshot.empty) {
     return res.status(409).send('You have already registered that account')
   }
-  console.log('sigio la caca');
 
   const userAccount = await db.collection('accounts').doc(discordID).get();
 
@@ -28,7 +27,7 @@ export const registerSummoner = async (req: Request, res: Response) => {
       discordID,
       regionURL,
       accountId,
-      summonerId,
+      id: summonerId,
     }).then(() => {
       return res.status(200).send('Summoner added')
     }).catch((error: any) => {
@@ -41,13 +40,13 @@ export const registerSummoner = async (req: Request, res: Response) => {
     const oldAccountSnapshotQuery = await db.collection('summoners').where('discordID', "==", discordID).get();
 
     if (!oldAccountSnapshotQuery.empty){
-     try {
-      oldAccountSnapshotQuery.forEach((querySnapshot: any) => {
-       querySnapshot.ref.delete();
-      })
-     } catch (error) {
-      return res.status(400).send('Account could not be added')
-     }
+      try {
+        oldAccountSnapshotQuery.forEach((querySnapshot: any) => {
+          querySnapshot.ref.delete();
+        })
+      } catch (error) {
+        return res.status(400).send('Account could not be added')
+      }
 
     }
 
@@ -56,7 +55,7 @@ export const registerSummoner = async (req: Request, res: Response) => {
       discordID,
       regionURL,
       accountId,
-      summonerId,
+      id: summonerId,
     }).then(() => {
 
       return res.status(200).send('The account was overwritten')
@@ -64,12 +63,7 @@ export const registerSummoner = async (req: Request, res: Response) => {
       console.error(error);
       return res.status(400).json({message: "Can not added summoner", error: error});
     });
-
-
-
   }
-
-
 };
 
 const registerAccount = async (discordID: string) => {
