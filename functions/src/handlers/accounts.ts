@@ -124,5 +124,6 @@ export const searchAccountByDiscordID = (req: Request, res: Response ) => {
     console.error(error);
     return res.status(400).json(error);
   });
+
 };
 
