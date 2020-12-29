@@ -1,7 +1,7 @@
 import * as functions from 'firebase-functions';
 import * as express from 'express';
 import  { registerSummoner, searchSummonerByDiscordID, searchAccountByDiscordID }  from './handlers/accounts';
-import  { searchGuildConfiguration, setGuildLanguage, setGuildRegions }  from './handlers/guilds';
+import  { searchGuildConfiguration, setGuildLanguage, setGuildRegions, deleteGuildRegion }  from './handlers/guilds';
 
 const app = express();
 
@@ -15,6 +15,8 @@ app.get('/summoners/:id', searchSummonerByDiscordID);
 //GUILDS
 app.post('/guilds/set-language', setGuildLanguage);
 app.post('/guilds/add-region', setGuildRegions);
+app.post('/guilds/delete-region', deleteGuildRegion);
+
 app.get('/guilds/:id', searchGuildConfiguration);
 
 exports.api = functions.https.onRequest(app);
