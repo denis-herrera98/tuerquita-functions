@@ -51,7 +51,7 @@ export const setGuildRegions = async (req: Request, res: Response) => {
     const regions = [region];
 
     if (!doc){
-      await createGuildDoc(idGuild, regions);
+      await createGuildDoc(idGuild, {regions});
     } else {
 
       const guildRef = db.collection('guilds').doc(idGuild);
@@ -69,6 +69,7 @@ export const setGuildRegions = async (req: Request, res: Response) => {
 
 const createGuildDoc = (idGuild: string, data: any ) => {
 
+  console.log(data);
   return db.collection('guilds').doc(idGuild).set(data);
 
 }

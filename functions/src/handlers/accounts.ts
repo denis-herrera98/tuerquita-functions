@@ -18,8 +18,6 @@ export const registerSummoner = async (req: Request, res: Response) => {
     await registerAccount(discordID);
   }
 
-  console.log(userAccount.data());
-
   if (userAccount.data()?.premium ){
 
     db.collection('summoners').add({
