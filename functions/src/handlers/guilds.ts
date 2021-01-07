@@ -98,9 +98,67 @@ export const deleteGuildRegion = async (req: Request, res: Response) => {
   }
 }
 
+export const createGuildWeebHook = async (req: Request, res: Response) => {
+
+  try {
+
+  const { id, guild_id, name, token, url } = req.body;
+  const guildRef = db.collection('guilds').doc(guild_id);
+
+
+  await guildRef.set({
+    weebhook: {
+    id,
+    name,
+    token,
+    url,
+  }}, {merge: true});
+
+  return res.status(200).send('Weebhook added');
+
+  } catch (error){
+    console.log(error);
+    return res.status(500).json(error)
+  }
+}
+
+
+export const deleteWeebHook = async (req: Request, res: Response) => {
+
+  try {
+
+    const id = req.params.id;
+    const FieldValue = Admin.firestore.FieldValue;
+    const guildRef = db.collection('guilds').doc(id);
+
+    await guildRef.update({
+      weebhook: FieldValue.delete(),
+    });
+
+    return res.status(200).send('Weebhook delete');
+
+  } catch (error){
+    console.log(error);
+    return res.status(500).json(error)
+  }
+}
+
+export const deleteGuild = async (req: Request, res: Response) => {
+
+  try {
+
+    const id = req.params.id;
+    await db.collection('guilds').doc(id).delete();
+
+    return res.status(200).send('Guild delete');
+  } catch (error){
+    console.log(error);
+    return res.status(500).json(error)
+  }
+}
+
+
+
 const createGuildDoc = (idGuild: string, data: any) => {
-
-  console.log(data);
   return db.collection('guilds').doc(idGuild).set(data);
-
 }

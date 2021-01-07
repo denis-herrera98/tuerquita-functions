@@ -1,7 +1,7 @@
 import * as functions from 'firebase-functions';
 import * as express from 'express';
 import  { registerSummoner, searchSummonerByDiscordID, searchAccountByDiscordID }  from './handlers/accounts';
-import  { searchGuildConfiguration, setGuildLanguage, setGuildRegions, deleteGuildRegion }  from './handlers/guilds';
+import  { deleteWeebHook, deleteGuild, searchGuildConfiguration, setGuildLanguage, setGuildRegions, deleteGuildRegion, createGuildWeebHook }  from './handlers/guilds';
 
 const app = express();
 
@@ -16,7 +16,11 @@ app.get('/summoners/:id', searchSummonerByDiscordID);
 app.post('/guilds/set-language', setGuildLanguage);
 app.post('/guilds/add-region', setGuildRegions);
 app.post('/guilds/delete-region', deleteGuildRegion);
-
 app.get('/guilds/:id', searchGuildConfiguration);
+app.delete('/guilds/delete/:id', deleteGuild)
+
+//WEEBHOOKS
+app.post('/weebhook/create', createGuildWeebHook);
+app.delete('/weebhook/delete/:id', deleteWeebHook)
 
 exports.api = functions.https.onRequest(app);
