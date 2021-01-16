@@ -94,7 +94,7 @@ export const deleteGuildRegion = async (req: Request, res: Response) => {
 
   } catch (error){
     console.log(error);
-    return res.status(500).json(error)
+    return res.status(500).json('An error ocurred')
   }
 }
 
@@ -107,12 +107,11 @@ export const createGuildWeebHook = async (req: Request, res: Response) => {
 
 
   await guildRef.set({
-    weebhook: {
-    id,
-    name,
-    token,
-    url,
-  }}, {merge: true});
+    weebhook_id: id,
+    weebhook_name: name,
+    weebhook_token: token,
+    weebhook_url: url,
+  }, {merge: true});
 
   return res.status(200).send('Weebhook added');
 
@@ -132,7 +131,10 @@ export const deleteWeebHook = async (req: Request, res: Response) => {
     const guildRef = db.collection('guilds').doc(id);
 
     await guildRef.update({
-      weebhook: FieldValue.delete(),
+      weebhook_url: FieldValue.delete(),
+      weebhook_name: FieldValue.delete(),
+      weebhook_id: FieldValue.delete(),
+      weebhook_token: FieldValue.delete(),
     });
 
     return res.status(200).send('Weebhook delete');
@@ -151,6 +153,7 @@ export const deleteGuild = async (req: Request, res: Response) => {
     await db.collection('guilds').doc(id).delete();
 
     return res.status(200).send('Guild delete');
+
   } catch (error){
     console.log(error);
     return res.status(500).json(error)

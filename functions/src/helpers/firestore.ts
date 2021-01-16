@@ -5,7 +5,7 @@ export const checkIfDocumentsExists = async( collection: string, docID: string) 
 
     return db.collection(collection).doc(docID).get()
         .then(doc => {
-            if (!doc.exists){
+              if (!doc.exists){
                 return null
             }
             return doc;
